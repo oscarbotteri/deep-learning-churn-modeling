@@ -1,16 +1,35 @@
-# This is a sample Python script.
-
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+import os
+from keras.saving import load_model
+from sklearn.preprocessing import StandardScaler
+from model import load
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+def get_model(existing: bool):
+    if not existing:
+        return load()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    model = load_model("model.keras")
+
+    print("Loaded model from disk")
+
+    return model
+
+
+def main():
+    exists = os.path.exists("model.keras")
+
+    if not exists:
+        print("No previously model found, generating new one")
+
+    model = get_model(exists)
+    sc_x = StandardScaler()
+
+    # TODO: Read values from CLI
+    prediction = model.predict(
+        sc_x.fit_transform([[0, 0, 600, 1, 40, 3, 60000, 2, 1, 1, 50000]])
+    )
+
+    print("Susceptibility to leave {:.1%}".format(prediction[0][0]))
+
+
+main()
